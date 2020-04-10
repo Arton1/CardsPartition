@@ -1,46 +1,50 @@
-from solution.evolutional_algorithm.genotype import Genotype
+from .genotype import Genotype
 from random import randint, random, uniform, sample, seed
 from math import ceil, pi
 
 
 class Population:
-    _AMOUNT_OF_CANDIDATES = 50
+    _AMOUNT_OF_CANDIDATES = 200
     _AMOUNT_OF_CHILDREN = _AMOUNT_OF_CANDIDATES
-    _TOURNAMENT_SIZE = 15
+    _TOURNAMENT_SIZE = 5
 
     def __init__(self,
-                 candidates_amount=_AMOUNT_OF_CANDIDATES,
-                 children_amount=_AMOUNT_OF_CHILDREN,
-                 seed=None
+                 amount_of_cards,
+                 atarget,
+                 btarget,
                  ):
+        self._atarget = atarget
+        self._btarget = btarget
         self._candidates = []
         self._generation = 1
-        self._children_amount = children_amount
+        self._children_amount = self._AMOUNT_OF_CHILDREN
         self._tournament_size = self._TOURNAMENT_SIZE
-        self._create_starting_population(candidates_amount, seed)
+        self._create_starting_population(self._AMOUNT_OF_CANDIDATES, amount_of_cards)
 
-    def _create_starting_population(self, candidates_amount, seed_value=None):
+    def _create_starting_population(self, candidates_amount, amount_of_cards, seed_value=None):
         if seed_value is not None:
             seed(seed_value)
         for candidate in range(candidates_amount):
-            self._candidates.append(Genotype.create_new())
+            genes = [randint(0, 1) for card in range(amount_of_cards)]
+            genotype = Genotype(genes)
+            genotype.evaluate_fitness(self._atarget, self._btarget)
+            self._candidates.append(genotype)
         if seed_value is not None:
             seed()
 
     def print_information(self):
         print(f"Generacja: {self._generation}")
-        for index, genotype in enumerate(sorted(self._candidates, key=lambda x: x.get_fitness(), reverse=True)):
+        print(f"A = {self._atarget} B = {self._btarget}")
+        for index, genotype in enumerate(sorted(self._candidates, key=lambda x: x.get_fitness())):
+            first_stack_sum, second_stack_product = genotype.get_cards_sum_and_product()
             fitness = genotype.get_fitness()
-            print(f"{index + 1} : {fitness}")
+            print(f"{index + 1} : {first_stack_sum} : {second_stack_product} : {fitness}")
 
     def get_statistics(self):
         sum = 0
         for genotype in self._candidates:
             sum += genotype.get_fitness()
         return self._generation, sum/len(self._candidates)
-        
-    def set_fitness(self, world):
-        pass
 
     def _set_best(self):
         best_fitness = self._best_genotype.get_fitness()
@@ -67,7 +71,7 @@ class Population:
         # for fighter in range(self._tournament_size):
             # tournament_candidates.append(candidates[randint(0, len(candidates)-1)]) # ze zwracaniem
         tournament_candidates = sample(candidates, self._tournament_size) # bez zwracania
-        return max(tournament_candidates, key=lambda x: x.get_fitness())
+        return min(tournament_candidates, key=lambda x: x.get_fitness())
 
     def _ranking_select_individual(self, candidates):
         candidates.sort(key=lambda x: x.get_fitness())
@@ -80,7 +84,7 @@ class Population:
             index_sum += index
 
     def _best_select_individual(self, candidates_with_fitness):
-        return max(candidates, key=lambda x: x.get_fitness())
+        return max(candidates_with_fitness, key=lambda x: x.get_fitness())
 
     def _select_pair_of_parents(self):
         first_parent = self._tournament_select_individual(self._candidates)
@@ -96,11 +100,12 @@ class Population:
             pair_of_children = Genotype.create_pair_by_multipoints(first_parent, second_parent)
             for child in pair_of_children:
                 child.mutate()
+                child.evaluate_fitness(self._atarget, self._btarget)
                 children.append(child)
         return children
 
     def _update_population(self, children):
-        self._candidates = children
+        self._candidates = sorted(children + self._candidates, key=lambda x: x.get_fitness())[0:len(self._candidates)]
 
     def evolve(self, amount_of_iterations=1):
         for i in range(amount_of_iterations):
