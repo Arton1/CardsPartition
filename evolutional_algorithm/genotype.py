@@ -1,14 +1,16 @@
-from random import randint, random, sample, uniform
-from math import ceil, floor, pi, sqrt
+from random import random, sample
+from math import sqrt
 
 
 class Genotype:
-    _AMOUNT_OF_CROSSOVER_POINTS = 5
-    _MUTATION_PROBABILITY = 3/10*3/10
-        
     def __init__(self, created_genes):
         self._fitness = None
         self._genes = created_genes
+
+    def set_constants(amount_of_crossover_points, mutation_probability):
+        # called by Config class
+        Genotype._AMOUNT_OF_CROSSOVER_POINTS = amount_of_crossover_points
+        Genotype._MUTATION_PROBABILITY = mutation_probability
 
     def get_cards_sum_and_product(self):
         first_stack_sum = 0

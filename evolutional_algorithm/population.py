@@ -4,10 +4,6 @@ from math import ceil, pi
 
 
 class Population:
-    _AMOUNT_OF_CANDIDATES = 200
-    _AMOUNT_OF_CHILDREN = _AMOUNT_OF_CANDIDATES
-    _TOURNAMENT_SIZE = 5
-
     def __init__(self,
                  amount_of_cards,
                  atarget,
@@ -16,19 +12,24 @@ class Population:
         self._atarget = atarget
         self._btarget = btarget
         self._candidates = []
-        self._generation = 1
-        self._children_amount = self._AMOUNT_OF_CHILDREN
-        self._tournament_size = self._TOURNAMENT_SIZE
-        self._create_starting_population(self._AMOUNT_OF_CANDIDATES, amount_of_cards)
+        self._generation = 0
+        self._create_starting_population(amount_of_cards)
 
-    def _create_starting_population(self, candidates_amount, amount_of_cards, seed_value=None):
+    def set_constants(amount_of_candidates, amount_of_children, tournament_size):
+        # called by Config class
+        Population._AMOUNT_OF_CANDIDATES = amount_of_candidates
+        Population._AMOUNT_OF_CHILDREN = amount_of_children
+        Population._TOURNAMENT_SIZE = tournament_size
+
+    def _create_starting_population(self, amount_of_cards, seed_value=None):
         if seed_value is not None:
             seed(seed_value)
-        for candidate in range(candidates_amount):
+        for candidate in range(self._AMOUNT_OF_CANDIDATES):
             genes = [randint(0, 1) for card in range(amount_of_cards)]
             genotype = Genotype(genes)
             genotype.evaluate_fitness(self._atarget, self._btarget)
             self._candidates.append(genotype)
+        print(len(self._candidates))
         if seed_value is not None:
             seed()
 
@@ -72,7 +73,7 @@ class Population:
         tournament_candidates = []
         # for fighter in range(self._tournament_size):
             # tournament_candidates.append(candidates[randint(0, len(candidates)-1)]) # ze zwracaniem
-        tournament_candidates = sample(candidates, self._tournament_size) # bez zwracania
+        tournament_candidates = sample(candidates, self._TOURNAMENT_SIZE) # bez zwracania
         return min(tournament_candidates, key=lambda x: x.get_fitness())
 
     def _ranking_select_individual(self, candidates):
@@ -97,7 +98,7 @@ class Population:
 
     def _create_children(self):
         children = []
-        for pair_of_parents in range(0, self._children_amount, 2):
+        for pair_of_parents in range(0, self._AMOUNT_OF_CHILDREN, 2):
             first_parent, second_parent = self._select_pair_of_parents()
             pair_of_children = Genotype.create_pair_by_multipoints(first_parent, second_parent)
             for child in pair_of_children:
