@@ -8,7 +8,7 @@ class Config:
             for line in file:
                 key, value = line.strip("\n").split("=")
                 self._dict_values[key] = value
-        population.Population.set_constants(self.get_population_size(), self.get_amount_of_children(), self.get_tournament_size())
+        population.Population.set_constants(self.get_max_generation(), self.get_population_size(), self.get_amount_of_children(), self.get_tournament_size())
         genotype.Genotype.set_constants(self.get_amount_of_crossover_points(), self.get_mutation_probability())
 
     def get_max_generation(self):

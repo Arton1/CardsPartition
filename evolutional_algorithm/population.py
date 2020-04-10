@@ -1,6 +1,6 @@
 from .genotype import Genotype
 from random import randint, random, uniform, sample, seed
-from math import ceil, pi
+from math import fabs
 
 
 class Population:
@@ -8,15 +8,18 @@ class Population:
                  amount_of_cards,
                  atarget,
                  btarget,
+                 threshold,
                  ):
         self._atarget = atarget
         self._btarget = btarget
+        self._threshold = threshold
         self._candidates = []
         self._generation = 0
         self._create_starting_population(amount_of_cards)
 
-    def set_constants(amount_of_candidates, amount_of_children, tournament_size):
+    def set_constants(max_generation, amount_of_candidates, amount_of_children, tournament_size):
         # called by Config class
+        Population._MAX_GENERATION = max_generation
         Population._AMOUNT_OF_CANDIDATES = amount_of_candidates
         Population._AMOUNT_OF_CHILDREN = amount_of_children
         Population._TOURNAMENT_SIZE = tournament_size
@@ -33,10 +36,15 @@ class Population:
         if seed_value is not None:
             seed()
 
+    def print_information(self):
+        self.print_generation()
+        self.print_candidates_info()
+        self.print_statistics()
+
     def print_generation(self):
         print(f"Generacja: {self._generation}")
 
-    def print_information(self):
+    def print_candidates_info(self):
         print(f"A = {self._atarget} B = {self._btarget}")
         for index, genotype in enumerate(sorted(self._candidates, key=lambda x: x.get_fitness())):
             first_stack_sum, second_stack_product = genotype.get_cards_sum_and_product()
@@ -48,6 +56,9 @@ class Population:
         for genotype in self._candidates:
             sum += genotype.get_fitness()
         print(f"Średnia: {sum/len(self._candidates)}")
+
+    def print_fitness(self, first_stack_sum, second_stack_product):
+        print(f"Dopasowanie najlepszego osobnika: A:{fabs(self._atarget-first_stack_sum)/self._atarget} B:{fabs(self._btarget-second_stack_product)/self._btarget}")
 
     def _set_best(self):
         best_fitness = self._best_genotype.get_fitness()
@@ -86,8 +97,8 @@ class Population:
                 return candidate
             index_sum += index
 
-    def _best_select_individual(self, candidates_with_fitness):
-        return max(candidates_with_fitness, key=lambda x: x.get_fitness())
+    def _get_best_individual(self):
+        return min(self._candidates, key=lambda x: x.get_fitness())
 
     def _select_pair_of_parents(self):
         first_parent = self._tournament_select_individual(self._candidates)
@@ -110,8 +121,18 @@ class Population:
     def _update_population(self, children):
         self._candidates = sorted(children + self._candidates, key=lambda x: x.get_fitness())[0:len(self._candidates)]
 
-    def evolve(self, amount_of_iterations=1):
-        for i in range(amount_of_iterations):
+    def evolve(self):
+        self.print_information()
+        best_individual = self._get_best_individual()
+        first_stack_sum, second_stack_product = best_individual.get_cards_sum_and_product()
+        self.print_fitness(first_stack_sum, second_stack_product)
+        while (self._generation < self._MAX_GENERATION
+                and (fabs(self._atarget-first_stack_sum)/self._atarget > self._threshold
+                     or fabs(self._btarget-second_stack_product)/self._btarget > self._threshold)):
             children = self._create_children()
             self._update_population(children)
             self._generation += 1
+            self.print_information()
+            best_individual = self._get_best_individual()
+            first_stack_sum, second_stack_product = best_individual.get_cards_sum_and_product()
+            self.print_fitness(first_stack_sum, second_stack_product)
