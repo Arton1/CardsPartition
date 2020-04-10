@@ -32,19 +32,21 @@ class Population:
         if seed_value is not None:
             seed()
 
-    def print_information(self):
+    def print_generation(self):
         print(f"Generacja: {self._generation}")
+
+    def print_information(self):
         print(f"A = {self._atarget} B = {self._btarget}")
         for index, genotype in enumerate(sorted(self._candidates, key=lambda x: x.get_fitness())):
             first_stack_sum, second_stack_product = genotype.get_cards_sum_and_product()
             fitness = genotype.get_fitness()
             print(f"{index + 1} : {first_stack_sum} : {second_stack_product} : {fitness}")
 
-    def get_statistics(self):
+    def print_statistics(self):
         sum = 0
         for genotype in self._candidates:
             sum += genotype.get_fitness()
-        return self._generation, sum/len(self._candidates)
+        print(f"Średnia: {sum/len(self._candidates)}")
 
     def _set_best(self):
         best_fitness = self._best_genotype.get_fitness()
