@@ -3,10 +3,14 @@ from config import Config
 from sys import argv
 import cProfile
 
-amount_of_cards = 10
-A = 30
-B = 100
-config = Config("./consts.config")
+
+if len(argv) != 4:
+    print("Usage: python main.py amount_of_cards A B")
+    exit()
+amount_of_cards = int(argv[1])
+A = int(argv[2])
+B = int(argv[3])
+config = Config("consts.config")
 population = Population(amount_of_cards, A, B)
 population.print_information()
 population.print_statistics()
