@@ -1,2 +1,4 @@
 Masz N kart z wartościami od 1 do N. Przy pomocy algorytmu genetycznego należy podzielić je na dwa stosy, gdzie suma wartości kart na pierwszym stosie ma wartość jak najbliższą do A, a iloczyn wartości kart na drugim stosie jak najbliższa wartości B. WE: liczba kart N, suma kart A, iloczyn kart B, satysfakcjonujący poziom dopasowania w %. WY: podział kart na stosy z wynikami działań. 
 // Więcej info na http://home.elka.pw.edu.pl/~mmarkiew/2020-pszt.html
+
+[Dokumentacja](https://docs.google.com/document/d/1NlRC5hm1FW2b0vmgYTBo154zAS1mLw9cq1RTzC2ZS00/edit)
