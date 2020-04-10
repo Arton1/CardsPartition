@@ -8,7 +8,7 @@ class Config:
             for line in file:
                 key, value = line.strip("\n").split("=")
                 self._dict_values[key] = value
-        population.Population.set_constants(self.get_max_generation(), self.get_population_size(), self.get_amount_of_children(), self.get_tournament_size())
+        population.Population.set_constants(self.get_max_generation(), self.get_population_size(), self.get_amount_of_children(), self.get_tournament_size(), self.get_initial_population_seed())
         genotype.Genotype.set_constants(self.get_amount_of_crossover_points(), self.get_mutation_probability())
 
     def get_max_generation(self):
@@ -28,3 +28,10 @@ class Config:
 
     def get_amount_of_crossover_points(self):
         return int(self._dict_values["crossover points amount"])
+    
+    def get_initial_population_seed(self):
+        value = self._dict_values["random initial population"]
+        if value == 'True':
+            return None
+        elif value == 'False':
+            return self._dict_values["initial population seed"]

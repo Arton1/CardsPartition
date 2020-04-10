@@ -17,23 +17,23 @@ class Population:
         self._generation = 0
         self._create_starting_population(amount_of_cards)
 
-    def set_constants(max_generation, amount_of_candidates, amount_of_children, tournament_size):
+    def set_constants(max_generation, amount_of_candidates, amount_of_children, tournament_size, intial_population_seed):
         # called by Config class
         Population._MAX_GENERATION = max_generation
         Population._AMOUNT_OF_CANDIDATES = amount_of_candidates
         Population._AMOUNT_OF_CHILDREN = amount_of_children
         Population._TOURNAMENT_SIZE = tournament_size
+        Population._INITIAL_POPULATION_SEED = intial_population_seed
 
-    def _create_starting_population(self, amount_of_cards, seed_value=None):
-        if seed_value is not None:
-            seed(seed_value)
+    def _create_starting_population(self, amount_of_cards):
+        if self._INITIAL_POPULATION_SEED is not None:
+            seed(self._INITIAL_POPULATION_SEED)
         for candidate in range(self._AMOUNT_OF_CANDIDATES):
             genes = [randint(0, 1) for card in range(amount_of_cards)]
             genotype = Genotype(genes)
             genotype.evaluate_fitness(self._atarget, self._btarget)
             self._candidates.append(genotype)
-        print(len(self._candidates))
-        if seed_value is not None:
+        if self._INITIAL_POPULATION_SEED is not None:
             seed()
 
     def print_information(self):

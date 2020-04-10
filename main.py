@@ -14,6 +14,6 @@ threshold = float(argv[4].strip("%"))/100
 config = Config("consts.config")
 population = Population(amount_of_cards, a, b, threshold)
 population.print_information()
-population.print_statistics()
-population.evolve()
+# population.print_statistics()
+# population.evolve()
     
