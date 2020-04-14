@@ -70,25 +70,25 @@ class Population:
         self._best_genotype = best
 
     def _roulette_select_individual(self, candidates):
-        fitness_sum = sum(candidate.get_fitness() for candidate in candidates)
+        fitness_sum = sum(1/fitness for candidate, fitness in candidates_with_fitness)
         spin = random()
         probability_sum = 0
         for potential_parent in candidates:
             fitness = potential_parent.get_fitness()
-            probability = fitness / fitness_sum
+            probability = 1 / (fitness*fitness_sum)
             probability_sum += probability
             if probability_sum > spin:
                 return potential_parent
 
     def _tournament_select_individual(self, candidates):
         tournament_candidates = []
-        # for fighter in range(self._tournament_size):
+        # for participant in range(self._tournament_size):
             # tournament_candidates.append(candidates[randint(0, len(candidates)-1)]) # ze zwracaniem
         tournament_candidates = sample(candidates, self._TOURNAMENT_SIZE) # bez zwracania
         return min(tournament_candidates, key=lambda x: x.get_fitness())
 
     def _ranking_select_individual(self, candidates):
-        candidates.sort(key=lambda x: x.get_fitness())
+        candidates.sort(key=lambda x: x.get_fitness(), reverse=True)
         rank_sum = (len(candidates) + 1) * len(candidates) / 2
         spin = randint(0, rank_sum)
         index_sum = 0
