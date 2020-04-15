@@ -70,7 +70,7 @@ class Population:
         self._best_genotype = best
 
     def _roulette_select_individual(self, candidates):
-        fitness_sum = sum(1/fitness for candidate in candidates)
+        fitness_sum = sum(1/candidate.get_fitness() for candidate in candidates)
         spin = random()
         probability_sum = 0
         for potential_parent in candidates:
