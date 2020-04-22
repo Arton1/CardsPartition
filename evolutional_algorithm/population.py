@@ -36,13 +36,9 @@ class Population:
         if self._INITIAL_POPULATION_SEED is not None:
             seed()
 
-    def print_information(self):
-        self.print_generation()
-        self.print_candidates_info()
-        self.print_statistics()
-
-    def print_generation(self):
-        print(f"Generacja: {self._generation}")
+    def get_generation(self):
+        return self._generation
+        
 
     def print_candidates_info(self):
         print(f"A = {self._atarget} B = {self._btarget}")
@@ -51,14 +47,24 @@ class Population:
             fitness = genotype.get_fitness()
             print(f"{index + 1} : {first_stack_sum} : {second_stack_product} : {fitness}")
 
-    def print_statistics(self):
+    def get_generations_average_fitness(self):
         sum = 0
         for genotype in self._candidates:
             sum += genotype.get_fitness()
-        print(f"Średnia: {sum/len(self._candidates)}")
+        return sum/len(self._candidates)
 
-    def print_fitness(self, first_stack_sum, second_stack_product):
-        print(f"Dopasowanie najlepszego osobnika: A:{fabs(self._atarget-first_stack_sum)/self._atarget} B:{fabs(self._btarget-second_stack_product)/self._btarget}")
+    def get_generations_best_fitness(self):
+        return min(self._candidates, key=lambda x: x.get_fitness()).get_fitness()
+
+    def get_generations_A_threshold_fitness(self):
+        best_individual = self._get_best_individual()
+        first_stack_sum, second_stack_product = best_individual.get_cards_sum_and_product() 
+        return fabs(self._atarget-first_stack_sum)/self._atarget
+
+    def get_generations_B_threshold_fitness(self):
+        best_individual = self._get_best_individual()
+        first_stack_sum, second_stack_product = best_individual.get_cards_sum_and_product() 
+        return fabs(self._btarget-second_stack_product)/self._btarget
 
     def _set_best(self):
         best_fitness = self._best_genotype.get_fitness()
@@ -122,17 +128,23 @@ class Population:
         self._candidates = sorted(children + self._candidates, key=lambda x: x.get_fitness())[0:len(self._candidates)]
 
     def evolve(self):
-        self.print_information()
-        best_individual = self._get_best_individual()
-        first_stack_sum, second_stack_product = best_individual.get_cards_sum_and_product()
-        self.print_fitness(first_stack_sum, second_stack_product)
         while (self._generation < self._MAX_GENERATION
                 and (fabs(self._atarget-first_stack_sum)/self._atarget > self._threshold
                      or fabs(self._btarget-second_stack_product)/self._btarget > self._threshold)):
             children = self._create_children()
             self._update_population(children)
             self._generation += 1
-            self.print_information()
-            best_individual = self._get_best_individual()
-            first_stack_sum, second_stack_product = best_individual.get_cards_sum_and_product()
-            self.print_fitness(first_stack_sum, second_stack_product)
+
+    def evolveOnce(self):
+        # Returns evolution status
+        best_individual = self._get_best_individual()
+        first_stack_sum, second_stack_product = best_individual.get_cards_sum_and_product() 
+        if(self._generation < self._MAX_GENERATION
+                and (fabs(self._atarget-first_stack_sum)/self._atarget > self._threshold
+                     or fabs(self._btarget-second_stack_product)/self._btarget > self._threshold)):
+            children = self._create_children()
+            self._update_population(children)
+            self._generation += 1
+            return True  # Evolved
+        else:
+            return False  # Fulfilled ending condition
