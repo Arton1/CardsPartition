@@ -12,7 +12,7 @@ class Population:
                  ):
         self._atarget = atarget
         self._btarget = btarget
-        self._threshold = threshold
+        self._threshold = 1 - threshold # change threshold
         self._candidates = []
         self._generation = 0
         self._create_starting_population(amount_of_cards)
@@ -106,6 +106,9 @@ class Population:
     def _get_best_individual(self):
         return min(self._candidates, key=lambda x: x.get_fitness())
 
+    def get_best_solution(self):
+        return self._get_best_individual().get_solution()
+
     def _select_pair_of_parents(self):
         first_parent = self._tournament_select_individual(self._candidates)
         self._candidates.remove(first_parent)
@@ -128,6 +131,8 @@ class Population:
         self._candidates = sorted(children + self._candidates, key=lambda x: x.get_fitness())[0:len(self._candidates)]
 
     def evolve(self):
+        best_individual = self._get_best_individual()
+        first_stack_sum, second_stack_product = best_individual.get_cards_sum_and_product() 
         while (self._generation < self._MAX_GENERATION
                 and (fabs(self._atarget-first_stack_sum)/self._atarget > self._threshold
                      or fabs(self._btarget-second_stack_product)/self._btarget > self._threshold)):
@@ -140,8 +145,8 @@ class Population:
         best_individual = self._get_best_individual()
         first_stack_sum, second_stack_product = best_individual.get_cards_sum_and_product() 
         if(self._generation < self._MAX_GENERATION
-                and (fabs(self._atarget-first_stack_sum)/self._atarget > self._threshold
-                     or fabs(self._btarget-second_stack_product)/self._btarget > self._threshold)):
+                and (fabs(first_stack_sum)/self._atarget < self._threshold
+                     or fabs(second_stack_product)/self._btarget < self._threshold)):
             children = self._create_children()
             self._update_population(children)
             self._generation += 1

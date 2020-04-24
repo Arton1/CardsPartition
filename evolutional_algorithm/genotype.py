@@ -31,6 +31,19 @@ class Genotype:
     def get_fitness(self):
         return self._fitness
 
+    def get_solution(self):
+        # Returns A set and B set as tuple
+        A = list()
+        B = list()
+        for index, gene in enumerate(self._genes, start=1):
+            if gene == 0:
+                A.append(index)
+            elif gene == 1:
+                B.append(index)
+            else:
+                raise ValueError("Inapproriate gene value")
+        return A, B
+
     def create_pair_by_multipoints(self, other_parent):
         indexes = sorted(sample(range(0, len(self._genes)-1), self._AMOUNT_OF_CROSSOVER_POINTS))
         first_child_genes = []
