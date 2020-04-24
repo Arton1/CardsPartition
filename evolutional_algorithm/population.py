@@ -145,8 +145,8 @@ class Population:
         best_individual = self._get_best_individual()
         first_stack_sum, second_stack_product = best_individual.get_cards_sum_and_product() 
         if(self._generation < self._MAX_GENERATION
-                and (fabs(first_stack_sum)/self._atarget < self._threshold
-                     or fabs(second_stack_product)/self._btarget < self._threshold)):
+                and (fabs(self._atarget-first_stack_sum)/self._atarget > self._threshold
+                     or fabs(self._btarget-second_stack_product)/self._btarget > self._threshold)):
             children = self._create_children()
             self._update_population(children)
             self._generation += 1
